@@ -63,9 +63,10 @@ Hive \cite{hive} was the first SQL-on-Hadoop offering that provided an SQL-like 
 
 As SQL-on-Hadoop gained popularity, MapReduce based run-time did not provide the required response times, due to the high latency in launching map reduce jobs. To address this issue, Hive moved to a different run-time, Tez, which can run DAGs as a single job, reducing the latency in launching jobs. With Tez, a complex HiveQL query can be compiled into a single Tez job. Hive-on-Tez also provides pipelining data without writing into disk between stages of a Tez job. 
 
-Spark is a fast general purpose cluster computing engine that is compatible with Hadoop data.  There are three different systems that use Spark as their run-time for SQL processing: Shark \cite{shark}, Hive on Spark \cite{hiveSpark}, and Spark SQL \cite{sparkSQL}. Shark replaces the MapReduce run-time of Hive \cite{hive} with Spark. It is still uses the Hive compiler, and interfaces but genereates Spark jobs. Hive on Spark is another attempt at replacing MapReduce/Tez based run-times of Hive with Spark. Spark SQL uses the Shark \cite{shark} run-time but replaces the HiveQL and compiler with SQL, and a new compiler that uses the catalyst query optimizer. 
+Spark is a fast general purpose cluster computing engine that is compatible with Hadoop data.  There are three different systems that use Spark as their run-time for SQL processing: Shark \cite{sharksigmod13}, Hive on Spark \cite{hiveOnSpark}, and Spark SQL \cite{sparkSQL}. Shark replaces the MapReduce run-time of Hive \cite{hive} with Spark. It is still uses the Hive compiler, and interfaces but genereates Spark jobs. Hive on Spark is another attempt at replacing MapReduce/Tez based run-times of Hive with Spark. Spark SQL uses the Shark \cite{sharksigmod13} run-time but replaces the HiveQL and compiler with SQL, and a new compiler that uses the catalyst query optimizer. 
 
 We will discuss each of these systems in detail, comparing their compilers and run-times, and discussing the pros and cons of each approach.
+
 
 \section{Category 3: Database hybrids}
 
