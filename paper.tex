@@ -68,7 +68,7 @@ $
 %\end{abstract}
 
 \section{Introduction}
-Enterprises are increasingly use Apache Hadoop, more specifically HDFS, as a central repository for all their data;
+Enterprises are increasingly using Apache Hadoop, more specifically HDFS, as a central repository for all their data;
 data coming from various sources, including operational systems, social media and the web, sensors and smart devices, as well as their applications.
 At the same time many enterprise data management tools (e.g. from SAP ERP to Tableau) rely on SQL and many enterprise users are familiar and comfortable with it.
 As a result, SQL processing over Hadoop data has gained significant traction over the recent years, and the number of systems that provide such capability has increased significantly.
@@ -138,6 +138,38 @@ IBM Big SQL \cite{bigsql} leverages IBM's state-of-the-art relational database t
 Apache Drill \cite{drill} is an open-source project which aims at providing SQL-like declarative processing over self-describing semi-structured data. Its focus is on analyzing data without emposing a fixed schema or creating tables in a catalog like Hive MetaStore. It runs queries over files and HBase tables, and discovers data when reading input data. For every fixed chunk of data, it discovers its schema, creates an in-memory columnar representation, and generates specific code for processing. As such, it can accommodate data chunks with varying schemas. Drill provides a columnar execution engine that delays materialization as late as possible.
 
 \section{Category 3: Database hybrids}
+The systems discussed above typically contain large amounts of
+new code in order to create a SQL layer that is natively integrated
+with Hadoop. Consequently many of the native systems are young and do
+not have nearly as many production deployments as traditional database system
+implementations in the analtyical database market, and are thus not as
+well tested nor optimized for corner cases.
+
+Database hybrids have emerged to fill this gap, leveraging
+pre-existing robust database code for query processing and/or storage
+in order to accerlate production-ready implementations of
+SQL-on-Hadoop solutions. We will discuss three examples of database
+hybrids: HadoopDB~\cite{hadoopdb} which uses large amounts of
+PostgreSQL code; Hawq~\cite{hawq} which uses large amounts of
+Greenplum code; and Vortex which uses large amounts of Actian
+Vectorwise code. 
+
+We will, in particular, discuss the different architectures of these
+hyrbid systems. In some cases, database files are stored in HDFS,
+while in
+other cases, database files are stored on the same physical machines
+as HDFS, but on a separate file system. In some cases, data is
+dynamically moved from Hadoop file formats to the native storage
+structures of the DBMS~\cite{invisible-loading}.
+
+Query execution, as well, is performed differently in different hyrbid
+solutions. In some cases,
+the entirety of 
+query execution is performed by the database engine code, while in
+other cases, query execution is split between database engine code and
+native Hadoop execution engines such as MapReduce or Tez~\cite{split-execution}. We will also
+discuss other integration points with the Hadoop stack, such as
+integrations with Apache Hadoop YARN, and Apache HCatalog.
 
 \section{Category 4: Database connectors}
 
