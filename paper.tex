@@ -101,7 +101,17 @@ Oracle Big Data SQL \cite{bigdataSQL}, and TeraData QueryGrid \cite{queryGrid} a
 
 An important category of SQL-on-Hadoop includes systems that provide some level of SQL support over HBase data. HBase provides auto-sharding and fail over technology for scaling tables across multiple servers. It also enables updates, running on top of the HDFS, which itself does not support updates. HBase scales out to petabytes of data easily over a cluster of commodity hardware. It has become very popular to store IoT (Internet of Things) data, web, mobile and social data, as well as machine-generated data, as HBase supports high data ingestion rates that is typical for these data sets. In this category, we will examine two representative systems; namely Splice Machine \cite{splice} and Phoenix \cite{phoenix}. 
 
-Splice Machine \cite{splice} provides SQL support over HBase data using Apache Derby, targeting both operational as well as analytical workloads. It replaces the storage system and run-time of Derby with HBase and Hadoop. Splice Machine leverages the Derby compiler stack to generate execution plans that access HBase servers. Splice Machine adapts the Derby optimizer and planner to leverage HBase capabilities. 
+Splice Machine \cite{splice} provides SQL support over HBase data using Apache Derby, targeting both operational as well as analytical workloads. It replaces the storage system and run-time of Derby with HBase and Hadoop. Splice Machine leverages the Derby compiler stack to generate execution plans that access HBase servers. Splice Machine adapts the Derby optimizer and planner to leverage HBase capabilities, in particular the co-processors feature of HBase 
+(like SQL stored procedures) which enables pushing computations 
+down to each region (shard) of HBase.
+
+Phoenix provides SQL querying over HBase via an embeddable JDBC 
+driver built for high performance and read/write operations. It 
+converts SQL queries into execution plans composed of 
+HBase scans. Coprocessors and custom filters are  leveraged
+in order to improve performance.  Phoenix provides secondary indexes as
+ well as basic support for joins, both of which are difficult to 
+get with HBase. 
 
 
 \bibliographystyle{abbrv}
