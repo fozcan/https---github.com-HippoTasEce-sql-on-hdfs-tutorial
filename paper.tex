@@ -16,6 +16,7 @@
 \title{Tutorial: SQL-on-Hadoop Systems}
 
 \numberofauthors{4}
+
 % 1st author
 \author{
 \alignauthor
@@ -23,19 +24,20 @@ Daniel Abadi\\
 \affaddr{Yale University}\\
 \email{daniel.abadi@yale.edu}
 \alignauthor 
-\newcommand{\spmarcel}{\hspace{-8mm}}
-\spmarcel Shivnath Babu\\
-\spmarcel \affaddr{Duke University}\\
-\spmarcel \affaddr{Durham, NC} \\
-\email{\spmarcel shivnath@cs.duke.edu}
+\newcommand{\spshiv }{\hspace{-12mm}}
+\spshiv Shivnath Babu\\
+\spshiv \affaddr{Duke University}
+\spshiv \email{shivnath@cs.duke.edu} 
 \alignauthor
-Fatma {\"O}zcan\\
-\affaddr{IBM Research}\\
-\email{fozcan@us.ibm.com}
+\newcommand{\spfatma}{\hspace{-15mm}}
+\spfatma Fatma {\"O}zcan\\
+\spfatma \affaddr{IBM Research}
+\spfatma \email{fozcan@us.ibm.com}
 \alignauthor
-Ippokratis Pandis\\
-\affaddr{Cloudera}\\
-\email{ippokratis@cloudera.com}
+\newcommand{\spippo}{\hspace{-12mm}}
+\spippo  Ippokratis Pandis\\
+\spippo \affaddr{Cloudera}
+\spippo \email{ippokratis@cloudera.com}
 }
 \maketitle
 % ----------------
@@ -53,7 +55,7 @@ In this tutorial, we use the term SQL-on-Hadoop to refer to systems that provide
 
 \begin{itemize}
 \item {{\bf Native systems with big data run-times:} These are systems that utilize a big data run-time such as Tez, or Spark to execute SQL queries. This category includes systems such as Hive and Spark SQL.}
-\item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that use stand-alone long running processing to execute SQL queries over HDFS data. This category includes systems such as impala, tajo, presto, and Big SQL}
+\item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that use stand-alone long running processing to execute SQL queries over HDFS data. This category includes systems such as Impala, Presto, Drill, and Big SQL}
 \item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as Hadapt, HAWQ, and Vortex.}
 \item{ {\bf Database connectors:} This category includes the extensions provided by major database vendors to reach out to Hadoop and ingest HDFS data. }
 \item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix, and Splice Machine. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
@@ -84,7 +86,7 @@ Cloudera Impala \cite{Kornacker+15} an open-source, fully-integrated MPP SQL que
 
 IBM Big SQL \cite{bigsql} leverages IBM's state-of-the-art relational database technology, without imposing any database structures or restrictions, and processes standard SQL queries over HDFS data, supporting all common Hadoop file formats, including text and sequence files, as well as Parquet and ORC files. Big SQL does not introduce any propriety data format. Big SQL 3.0 shares the same catalog and table definitions with Hive using the Hive Metastore. Database workers read HDFS data directly and execute relational operations. Big SQL exploits sophisticated query rewrite transformations \cite{pirahesh96, winmagic} that are targeted for complex nested decision support queries. It uses sophisticated data statistics and a cost-based optimizer to choose the best query execution plan. In traditional shared-nothing databases, each worker owns a partition of the data. Big SQL deviates from this basic model and introduces a scheduler service that assigns HDFS blocks to database workers for processing on a query by query basis. The scheduler identifies where the HDFS blocks are and decides which database workers to include in the query plan. The assignment is done dynamically at run-time to accommodate failures: scheduler uses the workers that are currently up and running. This also allows elasticity. If a new node is added to the database cluster, it can be considered immediately by the scheduler for the new queries. Similarly, if a node crashes or the cluster is scaled down, the scheduler immediately detects this change and chooses database workers for future queries accordingly.
 
-Apache Drill is an open-source project which aims at providing SQL-like declarative processing over self-describing semi-structured data. Its focus is on analyzing data without emposing a fixed schema or creating tables in a catalog like Hive MetaStore. It runs queries over files and HBase tables, and discovers data when reading input data. For every fixed chunk of data, it discovers its schema, creates an in-memory columnar representation, and generates specific code for processing. As such, it can accommodate data chunks with varying schemas. Drill provides a columnar execution engine that delays materialization as late as possible.
+Apache Drill \cite{drill} is an open-source project which aims at providing SQL-like declarative processing over self-describing semi-structured data. Its focus is on analyzing data without emposing a fixed schema or creating tables in a catalog like Hive MetaStore. It runs queries over files and HBase tables, and discovers data when reading input data. For every fixed chunk of data, it discovers its schema, creates an in-memory columnar representation, and generates specific code for processing. As such, it can accommodate data chunks with varying schemas. Drill provides a columnar execution engine that delays materialization as late as possible.
 
 \section{Category 3: Database hybrids}
 
