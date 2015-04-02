@@ -118,9 +118,9 @@ By far the most popular file format is of course {\em plain text}.
 But there are other options.
 
 {\em Avro} uses JSON for defining data types and protocols, and compacts data in a binary format. 
-{\em SequenceFiles} are flat files of key/value pairs.
-While popular there are some column-oriented, more accurately PAX-like \cite{AilamakiDHS01}, file formats: {\em RC}, {\em ORC} and {\em DWRF} \cite{dwrf}, as well as {\em Parquet}.
-We present them and perform a comparison between them in terms of usability, data size (compression) and speed of processing
+{\em SequenceFiles} are flat files of key/value pairs. While these formats are widely used for many Hadoop
+tasks, column-oriented, more accurately PAX-like \cite{AilamakiDHS01}, file formats are more popularly used with SQL-on-Hadoop systems. These formats include {\em RC}, {\em ORC} and {\em DWRF} \cite{dwrf}, as well as {\em Parquet}. In this tutorial,
+we will present these file formats and compare them in terms of usability, data size (compression) and speed of processing.
 
 \section{Category 1: Native systems with big data run-times}
 
