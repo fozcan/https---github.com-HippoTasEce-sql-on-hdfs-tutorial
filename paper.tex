@@ -72,9 +72,10 @@ Enterprises are increasingly using Apache Hadoop, more specifically HDFS, as a c
 data coming from various sources, including operational systems, social media and the web, sensors and smart devices, as well as their applications.
 At the same time many enterprise data management tools (e.g. from SAP ERP and SAS to Tableau) rely on SQL and many enterprise users are familiar and comfortable with it.
 As a result, SQL processing over Hadoop data has gained significant traction over the recent years, and the number of systems that provide such capability has increased significantly.
-There is a wide variety of solutions, system architectures and capabilities in this space with each solution vendor claiming superiority of their solution.
+In this tutorial we use the term SQL-on-Hadoop to refer to systems that provide some level of declarative SQL(-like) processing over HDFS and noSQL data sources, using architectures that include computational or storage engines compatible with Apache Hadoop. 
 
-In this tutorial we use the term SQL-on-Hadoop to refer to systems that provide some level of declarative SQL(-like) processing over HDFS and noSQL data sources, using architectures that include computational or storage engines compatible with Apache Hadoop. The purpose of this tutorial is to provide an overview of the SQL-on-Hadoop options and to try to categorize and compare those options.
+There is a wide variety of solutions, system architectures and capabilities in this space of SQL-on-Hadoop with each solution vendor claiming superiority of their solution.
+The purpose of this tutorial is to provide an overview of the SQL-on-Hadoop options and to try to categorize and compare those options.
 
 \subsection{File formats}
 Before starting presenting the various SQL-on-Hadoop architectures and systems, an important aspect of SQL-on-Hadoop, which is orthogonal to all these architecture, is the various file formats used to store the data. While text is an important format for in-situ SQL analysis, and ELT processing, various columnar formats have been proposed to provide fast analytics query processing. We present many of the available options and argue about their strengths.
@@ -90,7 +91,7 @@ For the main part of this tutorial, we study the architecture of several SQL-on-
   \parskip=0em
 \item {{\bf Native systems with Big Data run-times:} These are systems that utilize a big data run-time such as Tez \cite{tezsigmod15}, or Spark \cite{sparkhotcloud10} to execute SQL queries. This category includes systems such as Hive \cite{hive} and Spark SQL \cite{sparkSQL}.}
 \item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that uses stand-alone long-running processing to execute SQL queries over HDFS data. This category includes systems such as Impala \cite{Kornacker+15}, Presto, Drill \cite{drill}, and Big SQL \cite{bigsql}}
-\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as Hadapt, HAWQ, and Vortex.}
+\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as Hadapt \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex.}
 \item{ {\bf Database connectors:} This category includes the extensions provided by major database vendors to reach out to Hadoop and ingest HDFS data.}
 \item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix, and Splice Machine. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
 \end{list}
