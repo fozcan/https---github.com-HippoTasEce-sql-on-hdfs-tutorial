@@ -74,7 +74,11 @@ At the same time many enterprise data management tools (e.g. from SAP ERP and SA
 As a result, SQL processing over Hadoop data has gained significant traction over the recent years, and the number of systems that provide such capability has increased significantly.
 In this tutorial we use the term SQL-on-Hadoop to refer to systems that provide some level of declarative SQL(-like) processing over HDFS and noSQL data sources, using architectures that include computational or storage engines compatible with Apache Hadoop. 
 
-It is important to note that there are two important distinct characteristics of this emerging eco-system that is different than traditional relational warehouses. First, in the world of Hadoop and HDFS data, complex data types, such as arrays, maps, structs, as well as JSON data are more prevalent. Second, the users utilize UDFs (user-defined-functions) very widely to express their business logic, which is sometimes very awkward to express in SQL itself. These two factors complicate the query optimization further in the Hadoop system. 
+It is important to note that there are important distinct characteristics of this emerging eco-system that are different than traditional relational warehouses.
+First, in the world of Hadoop and HDFS data, complex data types, such as arrays, maps, structs, as well as JSON data are more prevalent.
+Second, the users utilize UDFs (user-defined-functions) very widely to express their business logic, which is sometimes very awkward to express in SQL itself. 
+Third, often times there is little control over HDFS. Files can be added or modified outside the tight control of a query engine, making statistics maintenance a challenge.
+These factors complicate the query optimization further in the Hadoop system. 
 
 There is a wide variety of solutions, system architectures, and capabilities in this space, with varying degree of SQL support and capabilities. The purpose of this tutorial is to provide an overview of these options, categorize and compare them to gain insights to open research problems. 
 
@@ -91,8 +95,8 @@ For the main part of this tutorial, we study the architecture of several SQL-on-
   \parsep=0.5em
   \parskip=0em
 \item {{\bf Native systems with Big Data run-times:} These are systems that utilize a big data run-time such as Tez \cite{tezsigmod15}, or Spark \cite{sparkhotcloud10} to execute SQL queries. This category includes systems such as Hive \cite{hive} and Spark SQL \cite{sparkSQL}.}
-\item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that uses stand-alone long-running processing to execute SQL queries over HDFS data. This category includes systems such as Impala \cite{Kornacker+15}, Presto, Drill \cite{drill}, and Big SQL \cite{bigsql}}
-\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as HadoopDB \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex.}
+\item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that uses stand-alone long-running processing to execute SQL queries over HDFS data. This category includes systems such as Impala \cite{Kornacker+15}, Presto \cite{prestofcb}, Drill \cite{drill}, and Big SQL \cite{bigsql}}
+\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as HadoopDB \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex \cite{vortex}.}
 \item{ {\bf Database connectors:} This category includes the extensions provided by major database vendors to reach out to Hadoop and ingest HDFS data.}
 \item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix \cite{phoenix}, and Splice Machine \cite{splice}. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
 \end{list}
@@ -168,9 +172,9 @@ Database hybrids have emerged to fill this gap, leveraging
 pre-existing robust database code for query processing and/or storage
 in order to accerlate production-ready implementations of
 SQL-on-Hadoop solutions. We will discuss three examples of database
-hybrids: HadoopDB~\cite{hadoopdb} which uses large amounts of
-PostgreSQL code; Hawq~\cite{hawq} which uses large amounts of
-Greenplum code; and Vortex which uses large amounts of Actian
+hybrids: HadoopDB \cite{hadoopdb} which uses large amounts of
+PostgreSQL code; Hawq \cite{hawq} which uses large amounts of
+Greenplum code; and Vortex \cite{vortex} which uses large amounts of Actian
 Vectorwise code. 
 
 We will, in particular, discuss the different architectures of these
