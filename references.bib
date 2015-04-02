@@ -22,14 +22,14 @@ year = {2012},
 pages = {1712-1723}
 }
 
+@Comment pages = {922--933}
+@Comment volume = {2},
+@Comment number = {1},
 @article{hadoopdb,
 author = {Abouzeid, Azza and Bajda-Pawlikowski, Kamil and Abadi, Daniel J. and Rasin, Alexander and Silberschatz, Avi},
 title = "{HadoopDB: An Architectural Hybrid of MapReduce and DBMS Technologies for Analytical Workloads}",
 journal = {PVLDB},
-volume = {2},
-number = {1},
 year = {2009},
-pages = {922--933}
 }
 
 @article{colDBsvldb2009,
@@ -211,23 +211,27 @@ howpublished = {\url {http://hortonworks.com/hadoop/tez/}}
   year = {2015},
 }
 
+ @Comment booktitle = {Proceedings of the 2014 ACM SIGMOD International Conference on Management of Data},
+ @Comment series = {SIGMOD '14},
+ @Comment year = {2014},
+ @Comment pages = {1223--1234},
 @inproceedings{hawq,
  author = {Chang, Lei and Wang, Zhanwei and Ma, Tao and Jian, Lirong and Ma, Lili and Goldshuv, Alon and Lonergan, Luke and Cohen, Jeffrey and Welton, Caleb and Sherry, Gavin and Bhandarkar, Milind},
- title = {HAWQ: A Massively Parallel Processing SQL Engine in Hadoop},
- booktitle = {Proceedings of the 2014 ACM SIGMOD International Conference on Management of Data},
- series = {SIGMOD '14},
+ title = {{HAWQ}: A Massively Parallel Processing {SQL} Engine in Hadoop},
+ booktitle = {SIGMOD},
  year = {2014},
- pages = {1223--1234},
 } 
 
+ @Comment booktitle = {Proceedings of the 2011 ACM SIGMOD International Conference on Management of Data},
+ @Comment series = {SIGMOD '11},
+ @Comment year = {2011},
+ @Comment location = {Athens, Greece},
+ @Comment pages = {1165--1176},
 @inproceedings{split-execution,
  author = {Bajda-Pawlikowski, Kamil and Abadi, Daniel J. and Silberschatz, Avi and Paulson, Erik},
  title = {Efficient Processing of Data Warehousing Queries in a Split Execution Environment},
- booktitle = {Proceedings of the 2011 ACM SIGMOD International Conference on Management of Data},
- series = {SIGMOD '11},
+ booktitle = {SIGMOD},
  year = {2011},
- location = {Athens, Greece},
- pages = {1165--1176},
 } 
 
 @article{pax,
@@ -243,14 +247,16 @@ ee = {http://dx.doi.org/10.1007/s00778-002-0074-9},
 bibsource = {DBLP, http://dblp.uni-trier.de}
 }
 
+ @Comment booktitle = {Proceedings of the 16th International Conference on Extending Database Technology},
+ @Comment series = {EDBT '13},
+ @Comment year = {2013},
+ @Comment location = {Genoa, Italy},
+ @Comment pages = {1--10},
 @inproceedings{invisible-loading,
  author = {Abouzied, Azza and Abadi, Daniel J. and Silberschatz, Avi},
  title = {Invisible Loading: Access-driven Data Transfer from Raw Files into Database Systems},
- booktitle = {Proceedings of the 16th International Conference on Extending Database Technology},
- series = {EDBT '13},
+ booktitle = {EDBT},
  year = {2013},
- location = {Genoa, Italy},
- pages = {1--10},
 } 
 
 @inproceedings{sharksigmod13,
@@ -325,7 +331,7 @@ Yin Huai and
 Fusheng Wang and
 Yongqiang He and
 Xiaodong Zhang},
-title = {YSmart: Yet Another SQL-to-MapReduce Translator},
+title = {YSmart: Yet Another {SQL-to-MapReduce} Translator},
 booktitle = {ICDCS},
 year = {2011},
 pages = {25-36},
@@ -370,7 +376,7 @@ year = {1996},
 
 @misc{bigsql,
 author = {Scott Gray and Fatma {\"O}zcan and Hebert Pereyra and Bert van der Linden and Adriana Zubiri},
-title= {{IBM Big SQL} 3.0: SQL-on-Hadoop without compromise},
+title= "{IBM Big SQL 3.0: SQL-on-Hadoop without compromise}",
 HOWPUBLISHED= {\url{http://public.dhe.ibm.com/common/ssi/ecm/en/sww14019usen/SWW14019USEN.PDF}},
 year = 2014,
 }
@@ -408,7 +414,7 @@ year = {2015},
 
 @MISC{drill,
 key = {apacheDrill},
-title = {Apache Drill},
+title = "{Apache Drill}",
 howpublished = {\url {http://drill.apache.org/}}
 }
 
@@ -427,7 +433,7 @@ howpublished = {\url {http://drill.apache.org/}}
 
 @MISC{phoenix,
 key = {apachePhenix},
-title = {Apache Phoenix},
+title = "{Apache Phoenix}",
 howpublished = {\url {http://phoenix.apache.org/}}
 }
 
@@ -455,3 +461,50 @@ howpublished = {\url {http://phoenix.apache.org/}}
  booktitle = {ACM SIGMOD},
  year = {2011},
 } 
+
+@inproceedings{AilamakiDHS01,
+ author = {Ailamaki, Anastasia and 
+  {DeWitt}, David J. and 
+  Hill, Mark D. and 
+  Skounakis, Marios},
+ title = {Weaving relations for cache performance},
+ booktitle = {VLDB},
+ year = {2001},
+}
+
+@inproceedings{PadmanabhanMAJ01,
+ author = {Padmanabhan, Sriram and 
+  Malkemus, Timothy and 
+  Agarwal, Ramesh C. and 
+  Jhingran, Anant},
+ title = {Block Oriented Processing of Relational Database Operations in Modern Computer Architectures},
+ booktitle = {ICDE},
+ year = {2001}
+}
+
+@inproceedings{Graefe90,
+ author = {Graefe, Goetz},
+ title = {Encapsulation of parallelism in the {Volcano} query processing system},
+ booktitle = {SIGMOD},
+ year = {1990},
+} 
+
+
+@misc{hdfs:caching,
+ author={Apache},
+ title={Centralized Cache Management in {HDFS}},
+ note={Available at https://hadoop.apache.org/docs/r2.3.0/hadoop-project-dist/hadoop-hdfs/CentralizedCacheManagement.html},
+}
+
+@misc{hdfs:shortcircuit,
+ author={Apache},
+ title={{HDFS} Short-Circuit Local Reads},
+ note={Available at http://hadoop.apache.org/docs/r2.5.1/hadoop-project-dist/hadoop-hdfs/ShortCircuitLocalReads.html},
+}
+
+@ARTICLE{WandermanL14,
+ author ={Skye Wanderman-Milne and Nong Li},
+ title = {Runtime Code Generation in {Cloudera Impala}},
+ journal = "IEEE Data Eng. Bull.",
+ year = {2014},
+}
