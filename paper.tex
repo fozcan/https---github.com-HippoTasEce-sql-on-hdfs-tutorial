@@ -74,11 +74,12 @@ At the same time many enterprise data management tools (e.g. from SAP ERP and SA
 As a result, SQL processing over Hadoop data has gained significant traction over the recent years, and the number of systems that provide such capability has increased significantly.
 In this tutorial we use the term SQL-on-Hadoop to refer to systems that provide some level of declarative SQL(-like) processing over HDFS and noSQL data sources, using architectures that include computational or storage engines compatible with Apache Hadoop. 
 
-There is a wide variety of solutions, system architectures and capabilities in this space of SQL-on-Hadoop with each solution vendor claiming superiority of their solution.
-The purpose of this tutorial is to provide an overview of the SQL-on-Hadoop options and to try to categorize and compare those options.
+It is important to note that there are two important distinct characteristics of this emerging eco-system that is different than traditional relational warehouses. First, in the world of Hadoop and HDFS data, complex data types, such as arrays, maps, structs, as well as JSON data are more prevalent. Second, the users utilize UDFs (user-defined-functions) very widely to express their business logic, which is sometimes very awkward to express in SQL itself. These two factors complicate the query optimization further in the Hadoop system. 
+
+There is a wide variety of solutions, system architectures, and capabilities in this space, with varying degree of SQL support and capabilities. The purpose of this tutorial is to provide an overview of these options, categorize and compare them to gain insights to open research problems. 
 
 \subsection{File formats}
-Before starting presenting the various SQL-on-Hadoop architectures and systems, an important aspect of SQL-on-Hadoop, which is orthogonal to all these architecture, is the various file formats used to store the data. While text is an important format for in-situ SQL analysis, and ELT processing, various columnar formats have been proposed to provide fast analytics query processing. We present many of the available options and argue about their strengths.
+Before starting presenting the various SQL-on-Hadoop architectures and systems, an important aspect of SQL-on-Hadoop, which is orthogonal to all these architectures, is the various file formats used to store the data. While text is an important format for in-situ SQL analysis, and ELT processing, various columnar formats have been proposed to provide fast analytics query processing. We present many of the available options and argue about their strengths.
 
 \subsection{Categories}
 For the main part of this tutorial, we study the architecture of several SQL-on-Hadoop systems and classify them into five categories:
@@ -91,18 +92,20 @@ For the main part of this tutorial, we study the architecture of several SQL-on-
   \parskip=0em
 \item {{\bf Native systems with Big Data run-times:} These are systems that utilize a big data run-time such as Tez \cite{tezsigmod15}, or Spark \cite{sparkhotcloud10} to execute SQL queries. This category includes systems such as Hive \cite{hive} and Spark SQL \cite{sparkSQL}.}
 \item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that uses stand-alone long-running processing to execute SQL queries over HDFS data. This category includes systems such as Impala \cite{Kornacker+15}, Presto, Drill \cite{drill}, and Big SQL \cite{bigsql}}
-\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as Hadapt \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex.}
+\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as HadoopDB \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex.}
 \item{ {\bf Database connectors:} This category includes the extensions provided by major database vendors to reach out to Hadoop and ingest HDFS data.}
-\item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix, and Splice Machine. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
+\item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix \cite{phoenix}, and Splice Machine \cite{splice}. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
 \end{list}
 
 \section{Tutorial structure}
 
-In this 3-hour tutorial, we will first present at a high-level the different architectures and categories for SQL-on-Hadoop processing and we argue about the pros and cons of each option.
-Next, we present the file formats that are prevalent in storing data in Hadoop. We present each option and a comparison between them in terms of usability, data size (compression) and speed of processing. Then we move to the main part of this tutorial where we present each individual category in detail. In particular, for each category we discuss its characteristics, the pros and cons and present in more detail one or two representative systems.
+In this 3-hour tutorial, we will first present at a high-level the different architectures and categories for SQL-on-Hadoop processing and argue about the pros and cons of each option.
+Next, we present the file formats that are prevalent in storing data in Hadoop. We present each file format and a comparison between them in terms of usability, data size (compression) and speed of processing. Then, we move to the main part of this tutorial where we present each individual category in detail. In particular, for each category we discuss its characteristics, the pros and cons and present in more detail one or two representative systems.
 We focus on the architectural differences, and cover in-depth their approach to indexing, updates, query optimization, as well as new algorithms they introduce.
-After presenting each category and in the last part of the tutorial we discuss again and debate 
-about architecture. That should be the engaging enough for the audience and act as a bridge to start a lively open discussion.  
+At the end, we will wrap up by summarizing all architectures, their pros, and cons, and how we see this space evolving, and where we think more research is needed.
+%After presenting each category and in the last part of the tutorial we discuss again and debate 
+about architecture. 
+We expect this tutorial to be the engaging enough for the audience and act as a bridge to start a lively open discussion.  
 
 \section{File Formats}
 
