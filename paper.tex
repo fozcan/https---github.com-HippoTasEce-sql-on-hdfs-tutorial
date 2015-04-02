@@ -80,7 +80,7 @@ Second, the users utilize UDFs (user-defined-functions) very widely to express t
 Third, often times there is little control over HDFS. Files can be added or modified outside the tight control of a query engine, making statistics maintenance a challenge.
 These factors complicate the query optimization further in the Hadoop system. 
 
-There is a wide variety of solutions, system architectures, and capabilities in this space, with varying degree of SQL support and capabilities. The purpose of this tutorial is to provide an overview of these options, categorize and compare them to gain insights to open research problems. 
+There is a wide variety of solutions, system architectures, and capabilities in this space, with varying degree of SQL support and capabilities. The purpose of this tutorial is to provide an overview of these options, categorize and compare them to gain insights into open research problems. 
 
 \subsection{File formats}
 Before starting presenting the various SQL-on-Hadoop architectures and systems, an important aspect of SQL-on-Hadoop, which is orthogonal to all these architectures, is the various file formats used to store the data. While text is an important format for in-situ SQL analysis, and ELT processing, various columnar formats have been proposed to provide fast analytics query processing. We present many of the available options and argue about their strengths.
@@ -114,8 +114,12 @@ We expect this tutorial to be the engaging enough for the audience and act as a 
 \section{File Formats}
 
 Even though the driver that enables all the system presented in this tutorial to work in a single cluster environment is the shared file system, Hadoop File System (HDFS), there is actually a variety of file format that are being used to store data. 
-By far the most popular file format is of course plain text.
-But there are other options, most of them being variants of PAX \cite{AilamakiDHS01}. For example, Avro, sequence, RC, ORC and DRWF, as well as Parquet.
+By far the most popular file format is of course {\em plain text}.
+But there are other options.
+
+{\em Avro} uses JSON for defining data types and protocols, and compacts data in a binary format. 
+{\em SequenceFiles} are flat files of key/value pairs.
+While popular there are some column-oriented, more accurately PAX-like \cite{AilamakiDHS01}, file formats: {\em RC}, {\em ORC} and {\em DWRF} \cite{dwrf}, as well as {\em Parquet}.
 We present them and perform a comparison between them in terms of usability, data size (compression) and speed of processing
 
 \section{Category 1: Native systems with big data run-times}
