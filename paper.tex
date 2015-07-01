@@ -30,7 +30,7 @@ $
   \mbox{\Large \sf Ippokratis Pandis}\\
   \mbox{\affaddr{Yale University}} &
   \mbox{\affaddr{Duke University}} &
-  \mbox{\affaddr{IBM Research}} &
+  \mbox{\affaddr{IBM Research - Almaden}} &
   \mbox{\affaddr{Cloudera}}\\
   \mbox{{\large \sf daniel.abadi@yale.edu}} &
   \mbox{{\large \sf shivnath@cs.duke.edu}} &
@@ -69,8 +69,7 @@ $
 
 \section{Introduction}
 Enterprises are increasingly using Apache Hadoop, more specifically HDFS, as a central repository for all their data;
-data coming from various sources, including operational systems, social media and the web, sensors and smart devices, as well as their applications.
-At the same time many enterprise data management tools (e.g. from SAP ERP and SAS to Tableau) rely on SQL and many enterprise users are familiar and comfortable with it.
+data coming from various sources, including operational systems, social media and the web, sensors and smart devices, as well as their applications.At the same time many enterprise data management tools (e.g. from SAP ERP and SAS to Tableau) rely on SQL and many enterprise users are familiar and comfortable with SQL.
 As a result, SQL processing over Hadoop data has gained significant traction over the recent years, and the number of systems that provide such capability has increased significantly.
 In this tutorial we use the term SQL-on-Hadoop to refer to systems that provide some level of declarative SQL(-like) processing over HDFS and noSQL data sources, using architectures that include computational or storage engines compatible with Apache Hadoop. 
 
@@ -80,133 +79,118 @@ Second, the users utilize UDFs (user-defined-functions) very widely to express t
 Third, often times there is little control over HDFS. Files can be added or modified outside the tight control of a query engine, making statistics maintenance a challenge.
 These factors complicate the query optimization further in the Hadoop system. 
 
-There is a wide variety of solutions, system architectures, and capabilities in this space, with varying degree of SQL support and capabilities. The purpose of this tutorial is to provide an overview of these options, categorize and compare them to gain insights into open research problems. 
+There is a wide variety of solutions, system architectures, and capabilities in this space, with varying degree of SQL support and capabilities. The purpose of this tutorial is to provide an overview of these options, discuss various different approaches, and compare them to gain insights into open research problems. 
 
-\subsection{File formats}
-Before starting presenting the various SQL-on-Hadoop architectures and systems, an important aspect of SQL-on-Hadoop, which is orthogonal to all these architectures, is the various file formats used to store the data. While text is an important format for in-situ SQL analysis, and ELT processing, various columnar formats have been proposed to provide fast analytics query processing. We present many of the available options and argue about their strengths.
+%\subsection{Categories}
+%For the main part of this tutorial, we study the architecture of several SQL-on-Hadoop systems and classify them into five categories:
 
-\subsection{Categories}
-For the main part of this tutorial, we study the architecture of several SQL-on-Hadoop systems and classify them into five categories:
+%\vspace{-2mm}
+%\setcounter{mycounter}{0}
+%\begin{list}{\arabic{mycounter}.}{\usecounter{mycounter}\leftmargin=1.4em}
+%  \itemsep=0.5em
+%  \parsep=0.5em
+%  \parskip=0em
+%\item {{\bf Native systems with Big Data run-times:} These are systems that utilize a big data run-time such as Tez \cite{tezsigmod15}, or Spark \cite{sparkhotcloud10} to execute SQL queries. This category includes systems such as Hive \cite{hive} and Spark SQL \cite{sparkSQL}.}
+%\item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that uses stand-alone long-running processing to execute SQL queries over HDFS data. This category includes systems such as Impala \cite{Kornacker+15}, Presto \cite{prestofcb}, Drill \cite{drill}, and Big SQL \cite{bigsql}}
+%\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as HadoopDB \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex \cite{vortex}.}
+%\item{ {\bf Database connectors:} This category includes the extensions provided by major database vendors to reach out to Hadoop and ingest HDFS data.}
+%\item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix \cite{phoenix}, and Splice Machine \cite{splice}. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
+%\end{list}
 
-\vspace{-2mm}
-\setcounter{mycounter}{0}
-\begin{list}{\arabic{mycounter}.}{\usecounter{mycounter}\leftmargin=1.4em}
-  \itemsep=0.5em
-  \parsep=0.5em
-  \parskip=0em
-\item {{\bf Native systems with Big Data run-times:} These are systems that utilize a big data run-time such as Tez \cite{tezsigmod15}, or Spark \cite{sparkhotcloud10} to execute SQL queries. This category includes systems such as Hive \cite{hive} and Spark SQL \cite{sparkSQL}.}
-\item{ {\bf Native systems with MPP architectures:} These are systems that employ an MPP database architecture that uses stand-alone long-running processing to execute SQL queries over HDFS data. This category includes systems such as Impala \cite{Kornacker+15}, Presto \cite{prestofcb}, Drill \cite{drill}, and Big SQL \cite{bigsql}}
-\item{{\bf Database hybrids:} These are systems that combine a relational SQL engine with Hadoop run-time. This category includes systems such as HadoopDB \cite{hadoopdb}, HAWQ \cite{hawq}, and Vortex \cite{vortex}.}
-\item{ {\bf Database connectors:} This category includes the extensions provided by major database vendors to reach out to Hadoop and ingest HDFS data.}
-\item{ {\bf noSQL/Hbase specific variants:} These are systems that provide a declarative SQL layer on top of noSQL systems, HBase in particular. The systems in this category are Phoenix \cite{phoenix}, and Splice Machine \cite{splice}. Note that these systems focus on OLTP-like workloads, whereas all other categories address OLAP-like analytics}
-\end{list}
+In this tutorial, we will examine the SQL-on-Hadoop systems along various dimensions. One important aspect is their data storage. Some of these systems support all native Hadoop formats, and do not impose any propriety data formats, and keep the data open to all applications running on the same platform. While there are some database hybrid solutions, such as HAWQ, HP Haven, and Vortex, that store their propriety data formats in HDFS. Most often, these systems are also able to run SQL queries over native HDFS formats, but do not provide the same level of performance.
+
+Some SQL-on-Hadoop systems provide their own SQL-specific run-times, such as Impala, Big SQL, and Presto, while others exploit a general purpose run-time such as Hive (MapReduce and Tez) and SparkSQL (Spark). 
+
+Another important aspect is the support for schema flexibility and complex data types. Almost all of these systems support complex data types, such as arrays and structs. But, only a few, such as Drill, are able to work with schemaless data. 
 
 \section{Tutorial structure}
 
-In this 3-hour tutorial, we will first present at a high-level the different architectures and categories for SQL-on-Hadoop processing and argue about the pros and cons of each option.
-Next, we present the file formats that are prevalent in storing data in Hadoop. We present each file format and a comparison between them in terms of usability, data size (compression) and speed of processing. Then, we move to the main part of this tutorial where we present each individual category in detail. In particular, for each category we discuss its characteristics, the pros and cons and present in more detail one or two representative systems.
-We focus on the architectural differences, and cover in-depth their approach to indexing, updates, query optimization, as well as new algorithms they introduce.
+In this 3-hour tutorial, we will first discuss the general system characteristics, and examine different approaches to data storage, query processing and optimization, indexing, and updates. In the second half of the tutorial, we will examine a set of representative systems in detail, and discuss several research problems they address.
+ 
+%present at a high-level the different architectures and categories for SQL-on-Hadoop processing and argue about the pros and cons of each option.Next, we present the file formats that are prevalent in storing data in Hadoop. We present each file format and a comparison between them in terms of usability, data size (compression) and speed of processing. Then, we move to the main part of this tutorial where we present each individual category in detail. In particular, for each category we discuss its characteristics, the pros and cons and present in more detail one or two representative systems.
+%We focus on the architectural differences, and cover in-depth their approach to indexing, updates, query optimization, as well as new algorithms they introduce.
 At the end, we will wrap up by summarizing all architectures, their pros, and cons, and how we see this space evolving, and where we think more research is needed.
-%After presenting each category and in the last part of the tutorial we discuss again and debate 
-about architecture. 
+%After presenting each category and in the last part of the tutorial we discuss again and debate about architecture. 
 We expect this tutorial to be the engaging enough for the audience and act as a bridge to start a lively open discussion.  
 
-\section{File Formats}
+\section{Overview of Representative Systems}
 
-Even though the driver that enables all the system presented in this tutorial to work in a single cluster environment is the shared file system, Hadoop File System (HDFS), there is actually a variety of file format that are being used to store data. 
-By far the most popular file format is of course {\em plain text}.
-But there are other options.
+Hive \cite{hive} was the first SQL-on-Hadoop offering that provided an SQL-like query language, called HiveQL, and used MapReduce run-time to execute queries. Hive compiled HiveQL queries into a series of map reduce jobs. 
+%Hive provided an interpreter that ran inside the map and reduce functions and executed various relational operations, including projection, selection, joins, and aggregations. Data movement and grouping were implemented using the MapReduce shuffle operator.
+As SQL-on-Hadoop gained popularity, MapReduce based run-time did not provide the required response times, due to the high latency in launching map reduce jobs. To address this issue, Hive moved to a different run-time, Tez, which can run DAGs as a single job, reducing the latency in launching jobs. 
+%With Tez, a complex HiveQL query can be compiled into a single Tez job. Hive-on-Tez also provides pipelining data without writing into disk between stages of a Tez job.
 
-{\em Avro} uses JSON for defining data types and protocols, and compacts data in a binary format. 
-{\em SequenceFiles} are flat files of key/value pairs. While these formats are widely used for many Hadoop
-tasks, column-oriented, more accurately PAX-like \cite{AilamakiDHS01}, file formats are more popularly used with SQL-on-Hadoop systems. These formats include {\em RC}, {\em ORC} and {\em DWRF} \cite{dwrf}, as well as {\em Parquet}. In this tutorial,
-we will present these file formats and compare them in terms of usability, data size (compression) and speed of processing.
+Spark is a fast, general purpose cluster computing engine that is compatible with Hadoop data and addresses the shortcoming of MapReduce. There are three different systems that use Spark as their run-time for SQL processing: Shark \cite{sharksigmod13}, Hive on Spark \cite{hiveOnSpark}, and Spark SQL \cite{sparkSQL}. 
+%Shark replaces the MapReduce run-time of Hive \cite{hive} with Spark run-time. It is still uses the Hive compiler, and interfaces but generates Spark jobs. Shark introduced an in-memory columnar data organization that allowed for fast execution of SQL queries. Hive on Spark is another attempt at replacing MapReduce/Tez based run-times of Hive with Spark run-time, but still relies on the Hive interpreter. Finally, Spark SQL uses the Shark \cite{sharksigmod13} run-time but replaces the HiveQL and compiler with a new compiler for SQL and uses the catalyst query optimizer.
 
-\section{Category 1: Native systems with big data run-times}
+%We will discuss each of these systems in detail, comparing their compilers and run-times, and discussing the pros and cons of each approach.
 
-Hive \cite{hive} was the first SQL-on-Hadoop offering that provided an SQL-like query language, called HiveQL, and used MapReduce run-time to execute queries. Hive compiled HiveQL queries into a series of map reduce jobs. Hive provided an interpreter that ran inside the map and reduce functions and executed various relational operations, including projection, selection, joins, and aggregations. Data movement and grouping were implemented using the MapReduce shuffle operator.
+%\section{Category 2: Native systems with MPP architectures}
 
-As SQL-on-Hadoop gained popularity, MapReduce based run-time did not provide the required response times, due to the high latency in launching map reduce jobs. To address this issue, Hive moved to a different run-time, Tez, which can run DAGs as a single job, reducing the latency in launching jobs. With Tez, a complex HiveQL query can be compiled into a single Tez job. Hive-on-Tez also provides pipelining data without writing into disk between stages of a Tez job.
-
-Spark is a fast, general purpose cluster computing engine that is compatible with Hadoop data and addresses the shortcoming of MapReduce. There are three different systems that use Spark as their run-time for SQL processing: Shark \cite{sharksigmod13}, Hive on Spark \cite{hiveOnSpark}, and Spark SQL \cite{sparkSQL}. Shark replaces the MapReduce run-time of Hive \cite{hive} with Spark run-time. It is still uses the Hive compiler, and interfaces but generates Spark jobs. Shark introduced an in-memory columnar data organization that allowed for fast execution of SQL queries. Hive on Spark is another attempt at replacing MapReduce/Tez based run-times of Hive with Spark run-time, but still relies on the Hive interpreter. Finally, Spark SQL uses the Shark \cite{sharksigmod13} run-time but replaces the HiveQL and compiler with a new compiler for SQL and uses the catalyst query optimizer.
-
-We will discuss each of these systems in detail, comparing their compilers and run-times, and discussing the pros and cons of each approach.
+As it became clear that the latency of launching jobs for each query is too expensive for interactive SQL query processing, there was a shift to shared-nothing database architectures for SQL processing over Hadoop data. Impala, Presto, Drill, as well as Big SQL all employ such MPP architectures, where a long-running process co-exists with DataNodes on each node in the cluster, and continuously answers SQL queries. These systems implement their own run-times and data movements between their long-running processes. 
 
 
-\section{Category 2: Native systems with MPP architectures}
+%After discussing the general characteristics of the systems in this category, we will examine 3 representatives systems in some detail: Impala, Big SQL, and Drill. 
 
-As it became clear that the latency of launching jobs for each query is too expensive for interactive SQL query processing, there was a shift to shared-nothing database architectures for SQL processing over Hadoop data. In this group, a long-running process co-exists with dataNodes on each node in the cluster, and continuously answers SQL queries. The systems in this category implement their own run-times and data movements between their long-running processes. 
+Cloudera Impala \cite{Kornacker+15} is an open-source, fully-integrated MPP SQL query engine. 
+%Unlike other systems (often forks of Postgres), Impala is a brand-new engine. It is written from the ground up in C++ and Java. 
+%To reduce latency, such as that incurred from utilizing MapReduce or by reading data remotely, Impala implements a distributed architecture based on daemon processes that are responsible for all aspects of query execution and that run on the same machines as the rest of the Hadoop infrastructure. 
+To perform data scans from both disk and memory at or near hardware speed,
+Impala uses an HDFS feature called {\em short-circuit local reads} 
+%\cite{hdfs:shortcircuit} 
+to bypass the DataNode protocol when reading from local disk. Impala can read at almost disk bandwidth and is typically able to saturate all available disks. 
+%Furthermore, {\em HDFS caching} \cite{hdfs:caching} allows Impala to access memory-resident data at memory bus speed and also saves CPU cycles as there is no need to copy data blocks and/or checksum them.
+%Impala leverages decades of research in parallel databases. The execution model is the traditional Volcano-style with Exchange operators \cite{Graefe90}. Processing is performed batch-at-a-time: each \texttt{GetNext()} call operates over batches of rows, similar to \cite{PadmanabhanMAJ01}. 
+A main characteristic of Impala is that employs LLVM to generate code at runtime to speed up frequently executed code paths \cite{WandermanL14}. 
+%The result is performance that is on par or exceeds that of commercial MPP analytic DBMSs, depending on the particular workload.
 
-After discussing the general characteristics of the systems in this category, we will examine 3 representatives systems in some detail: Impala, Big SQL, and Drill. 
+IBM Big SQL \cite{bigsql} leverages IBM's state-of-the-art relational database technology, 
+%without imposing any database structures or restrictions,
+to processes standard SQL queries over HDFS data, supporting all common Hadoop file formats, without introducing any propriety formats.
+%, including text and sequence files, as well as Parquet and ORC files. Big SQL does not introduce any propriety data format. 
+Big SQL 3.0 shares the same catalog and table definitions with Hive using the Hive Metastore. 
+%Database workers read HDFS data directly and execute relational operations. 
+Big SQL exploits sophisticated query rewrite transformations \cite{pirahesh96, winmagic} that are targeted for complex nested decision support queries. It uses sophisticated data statistics and a cost-based optimizer to choose the best query execution plan. 
+%In traditional shared-nothing databases, each worker owns a partition of the data. Big SQL deviates from this basic model and
+Big SQL introduces a scheduler service that assigns HDFS blocks to database workers for processing on a query by query basis. 
+%The scheduler identifies where the HDFS blocks are and decides which database workers to include in the query plan. The assignment is done dynamically at run-time to accommodate failures: scheduler uses the workers that are currently up and running. This also allows elasticity. If a new node is added to the database cluster, it can be considered immediately by the scheduler for the new queries. Similarly, if a node crashes or the cluster is scaled down, the scheduler immediately detects this change and chooses database workers for future queries accordingly.
 
-Cloudera Impala \cite{Kornacker+15} is an open-source, fully-integrated MPP SQL query engine. Unlike other systems (often forks of Postgres), Impala is a brand-new engine. It is written from the ground up in C++ and Java. To reduce latency, such as that incurred from utilizing MapReduce or by reading data remotely, Impala implements a distributed architecture based on daemon processes that are responsible for all aspects of query execution and that run on the same machines as the rest of the Hadoop infrastructure. 
-In order to perform data scans from both disk and memory at or near hardware speed,
-Impala uses an HDFS feature called {\em short-circuit local reads} \cite{hdfs:shortcircuit} to bypass the DataNode protocol when reading from local disk. Impala can read at almost disk bandwidth and is typically able to saturate all available disks. Furthermore, {\em HDFS caching} \cite{hdfs:caching} allows Impala to access memory-resident data at memory bus speed and also saves CPU cycles as there is no need to copy data blocks and/or checksum them.
-Impala leverages decades of research in parallel databases. The execution model is the traditional
-Volcano-style with Exchange operators \cite{Graefe90}. Processing is performed batch-at-a-time:
-each \texttt{GetNext()} call operates over batches of rows, similar to
-\cite{PadmanabhanMAJ01}. A main characteristic of Impala is that employs LLVM to generate code at runtime to speed up frequently executed code paths \cite{WandermanL14}. The result is performance that is on par or exceeds that of commercial MPP analytic DBMSs, depending on the particular workload.
+Apache Drill \cite{drill} is an open-source project which aims at providing SQL-like declarative processing over self-describing semi-structured data. Its focus is on analyzing data without imposing a fixed schema or creating tables in a catalog like Hive MetaStore. It runs queries over files and HBase tables, and discovers data when reading input data. For every fixed chunk of data, it discovers its schema, creates an in-memory columnar representation, and generates specific code for processing. As such, it can accommodate data chunks with varying schemas. 
+%Drill provides a columnar execution engine that delays materialization as late as possible.
 
-IBM Big SQL \cite{bigsql} leverages IBM's state-of-the-art relational database technology, without imposing any database structures or restrictions, and processes standard SQL queries over HDFS data, supporting all common Hadoop file formats, including text and sequence files, as well as Parquet and ORC files. Big SQL does not introduce any propriety data format. Big SQL 3.0 shares the same catalog and table definitions with Hive using the Hive Metastore. Database workers read HDFS data directly and execute relational operations. Big SQL exploits sophisticated query rewrite transformations \cite{pirahesh96, winmagic} that are targeted for complex nested decision support queries. It uses sophisticated data statistics and a cost-based optimizer to choose the best query execution plan. In traditional shared-nothing databases, each worker owns a partition of the data. Big SQL deviates from this basic model and introduces a scheduler service that assigns HDFS blocks to database workers for processing on a query by query basis. The scheduler identifies where the HDFS blocks are and decides which database workers to include in the query plan. The assignment is done dynamically at run-time to accommodate failures: scheduler uses the workers that are currently up and running. This also allows elasticity. If a new node is added to the database cluster, it can be considered immediately by the scheduler for the new queries. Similarly, if a node crashes or the cluster is scaled down, the scheduler immediately detects this change and chooses database workers for future queries accordingly.
+%\section{Category 3: Database hybrids}
+%The systems discussed above typically contain large amounts of new code in order to create a SQL layer that is natively integrated with Hadoop. Consequently many of the native systems are young and do not have nearly as many production deployments as traditional database system implementations in the analtyical database market, and are thus not as well tested nor optimized for corner cases.
 
-Apache Drill \cite{drill} is an open-source project which aims at providing SQL-like declarative processing over self-describing semi-structured data. Its focus is on analyzing data without emposing a fixed schema or creating tables in a catalog like Hive MetaStore. It runs queries over files and HBase tables, and discovers data when reading input data. For every fixed chunk of data, it discovers its schema, creates an in-memory columnar representation, and generates specific code for processing. As such, it can accommodate data chunks with varying schemas. Drill provides a columnar execution engine that delays materialization as late as possible.
-
-\section{Category 3: Database hybrids}
-The systems discussed above typically contain large amounts of
-new code in order to create a SQL layer that is natively integrated
-with Hadoop. Consequently many of the native systems are young and do
-not have nearly as many production deployments as traditional database system
-implementations in the analtyical database market, and are thus not as
-well tested nor optimized for corner cases.
-
-Database hybrids have emerged to fill this gap, leveraging
-pre-existing robust database code for query processing and/or storage
-in order to accerlate production-ready implementations of
-SQL-on-Hadoop solutions. We will discuss three examples of database
-hybrids: HadoopDB \cite{hadoopdb} which uses large amounts of
-PostgreSQL code; Hawq \cite{hawq} which uses large amounts of
-Greenplum code; and Vortex \cite{vortex} which uses large amounts of Actian
-Vectorwise code. 
-
-We will, in particular, discuss the different architectures of these
-hyrbid systems. In some cases, database files are stored in HDFS,
-while in
-other cases, database files are stored on the same physical machines
-as HDFS, but on a separate file system. In some cases, data is
-dynamically moved from Hadoop file formats to the native storage
-structures of the DBMS~\cite{invisible-loading}.
-
-Query execution, as well, is performed differently in different hyrbid
-solutions. In some cases,
-the entirety of 
-query execution is performed by the database engine code, while in
+Several SQL-on-Hadoop systems leverage existing relational database technology:
+%Database hybrids have emerged to leverage existing database  this gap, leveraging pre-existing robust database code for query processing and/or storage in order to accelerate production-ready implementations of SQL-on-Hadoop solutions. We will discuss three examples of database hybrids: 
+HadoopDB \cite{hadoopdb} uses large amounts of PostgreSQL code; HAWQ \cite{hawq} uses large amounts of Greenplum code; and Vortex \cite{vortex} uses large amounts of Actian Vectorwise code. 
+% We will, in particular, discuss the different architectures of these hyrbid systems. 
+In some cases, database files are stored in HDFS, while in other cases, database files are stored on the same physical machines
+as HDFS, but on a separate file system. In some cases, data is dynamically moved from Hadoop file formats to the native storage
+structures of the DBMS.
+%~\cite{invisible-loading}.
+%Query execution, as well, is performed differently in different hyrbid solutions. 
+In some cases, queries are executed by the database engine code, while in
 other cases, query execution is split between database engine code and
-native Hadoop execution engines such as MapReduce or Tez~\cite{split-execution}. We will also
-discuss other integration points with the Hadoop stack, such as
-integrations with Apache Hadoop YARN, and Apache HCatalog.
+native Hadoop execution engines such as MapReduce or Tez~\cite{split-execution}. 
+%We will also discuss other integration points with the Hadoop stack, such as integrations with Apache Hadoop YARN, and Apache HCatalog.
 
-\section{Category 4: Database connectors}
 
-All major database vendors provide some sort of connector to HDFS data. Some of these are just external table interfaces that allows to read HDFS data directly from the database. Early connectors from IBM DB2 \cite{ibm-sigmod2011}, Oracle, and TeraData are examples.
-All these solutions provide parallel data ingestion capabilities, but do not pushdown any processing to the Hadoop side. All HDFS data is ingested and processed in the database.
+%\section{Category 5: noSQL/HBase specific variants}
 
-Oracle Big Data SQL \cite{bigdataSQL}, and TeraData QueryGrid \cite{queryGrid} are more advanced solutions which are capable of delegating some query processing to Hadoop. Big Data SQL provides stand alone processes that run on the Hadoop platform and can execute projection and selection before sending the data to the Oracle database. TeraData QueryGrid leverages Hive on the Hadoop side to pushdown selection and projections. While these solutions limit the amount of data that needs to be moved into the database, the query processing, especially the joins and aggregations are still executed inside the database.
+An important category of SQL-on-Hadoop includes systems that provide some level of SQL support over HBase data. HBase provides auto-sharding and fail over technology for scaling tables across multiple servers. It also enables updates, running on top of the HDFS, which itself does not support updates. HBase scales out to petabytes of data easily over a cluster of commodity hardware. 
+%It has become very popular to store IoT (Internet of Things) data, web, mobile and social data, as well as machine-generated data, as HBase supports high data ingestion rates that is typical for these data sets. 
+%In this category, we will examine two representative systems; namely Splice Machine \cite{splice} and Phoenix \cite{phoenix}. 
 
-\section{Category 5: noSQL/HBase specific variants}
+Splice Machine \cite{splice} provides SQL support over HBase data using Apache Derby, targeting both operational as well as analytical workloads. It replaces the storage system and run-time of Derby with HBase and Hadoop. Splice Machine leverages the Derby compiler stack to generate execution plans that access HBase servers.
+%Splice Machine adapts the Derby optimizer and planner to leverage HBase capabilities, in particular the co-processors feature of HBase 
+(like SQL stored procedures) which enables pushing computations down to each region (shard) of HBase.
 
-An important category of SQL-on-Hadoop includes systems that provide some level of SQL support over HBase data. HBase provides auto-sharding and fail over technology for scaling tables across multiple servers. It also enables updates, running on top of the HDFS, which itself does not support updates. HBase scales out to petabytes of data easily over a cluster of commodity hardware. It has become very popular to store IoT (Internet of Things) data, web, mobile and social data, as well as machine-generated data, as HBase supports high data ingestion rates that is typical for these data sets. In this category, we will examine two representative systems; namely Splice Machine \cite{splice} and Phoenix \cite{phoenix}. 
+Phoenix provides SQL querying over HBase via an embeddable JDBC driver built for high performance and read/write operations. It 
+converts SQL queries into execution plans composed of HBase scans. Coprocessors and custom filters are  leveraged
+in order to improve performance.  Phoenix provides secondary indexes as  well as basic support for joins, both of which are difficult to get with HBase. 
 
-Splice Machine \cite{splice} provides SQL support over HBase data using Apache Derby, targeting both operational as well as analytical workloads. It replaces the storage system and run-time of Derby with HBase and Hadoop. Splice Machine leverages the Derby compiler stack to generate execution plans that access HBase servers. Splice Machine adapts the Derby optimizer and planner to leverage HBase capabilities, in particular the co-processors feature of HBase 
-(like SQL stored procedures) which enables pushing computations 
-down to each region (shard) of HBase.
 
-Phoenix provides SQL querying over HBase via an embeddable JDBC 
-driver built for high performance and read/write operations. It 
-converts SQL queries into execution plans composed of 
-HBase scans. Coprocessors and custom filters are  leveraged
-in order to improve performance.  Phoenix provides secondary indexes as
- well as basic support for joins, both of which are difficult to 
-get with HBase. 
 
 
 \bibliographystyle{abbrv}
